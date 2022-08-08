@@ -10,6 +10,8 @@ import 'package:ecommerce_app/src/constants/app_sizes.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Simple account screen showing some user info and a logout button.
+final kDialogDefaultKey = Key('Default-Alert-DialogBox-Key');
+
 class AccountScreen extends ConsumerWidget {
   const AccountScreen({Key? key}) : super(key: key);
 
@@ -37,10 +39,9 @@ class AccountScreen extends ConsumerWidget {
                       defaultActionText: 'Logout'.hardcoded,
                     );
                     if (logout == true) {
-                       ref
+                      ref
                           .read(accountScreenControllerProvider.notifier)
                           .signout();
-                      
                     }
                   },
           ),

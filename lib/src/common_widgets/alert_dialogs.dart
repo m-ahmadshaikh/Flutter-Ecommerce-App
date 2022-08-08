@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:ecommerce_app/src/features/authentication/presentation/account/account_screen.dart';
 import 'package:ecommerce_app/src/localization/string_hardcoded.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
@@ -27,6 +28,7 @@ Future<bool?> showAlertDialog({
               onPressed: () => Navigator.of(context).pop(false),
             ),
           TextButton(
+            key: kDialogDefaultKey,
             child: Text(defaultActionText),
             onPressed: () => Navigator.of(context).pop(true),
           ),
@@ -47,6 +49,8 @@ Future<bool?> showAlertDialog({
             onPressed: () => Navigator.of(context).pop(false),
           ),
         CupertinoDialogAction(
+
+            key: kDialogDefaultKey,
           child: Text(defaultActionText),
           onPressed: () => Navigator.of(context).pop(true),
         ),
