@@ -11,10 +11,11 @@ class EmailPasswordSignInController
       required EmailPasswordSignInFormType formType})
       : super(EmailPasswordSignInState(formType: formType));
 
-  Future<void> submit(String email, String password) async {
+  Future<bool> submit(String email, String password) async {
     state = state.copyWith(value: const AsyncValue.loading());
     final value = await AsyncValue.guard(() => _authenticate(email, password));
     state = state.copyWith(value: value);
+    return value.hasError == false;
   }
 
   Future<void> _authenticate(String email, String password) {
