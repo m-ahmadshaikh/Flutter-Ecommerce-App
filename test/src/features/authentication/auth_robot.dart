@@ -3,6 +3,7 @@ import 'package:ecommerce_app/src/features/authentication/data/fake_auth_reposit
 import 'package:ecommerce_app/src/features/authentication/presentation/account/account_screen.dart';
 import 'package:ecommerce_app/src/features/authentication/presentation/sign_in/email_password_sign_in_screen.dart';
 import 'package:ecommerce_app/src/features/authentication/presentation/sign_in/email_password_sign_in_state.dart';
+import 'package:ecommerce_app/src/features/products/presentation/home_app_bar/more_menu_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -21,6 +22,19 @@ class AuthRobot {
         child: const MaterialApp(
           home: AccountScreen(),
         )));
+  }
+
+  Future<void> openEmailAndPasswordSignInScreen() async {
+    final finder = find.byKey(MoreMenuButton.signInKey);
+    expect(finder, findsOneWidget);
+    await tester.tap(finder);
+    await tester.pumpAndSettle();
+  }
+  Future<void> openAccountScreen() async {
+    final finder = find.byKey(MoreMenuButton.accountKey);
+    expect(finder, findsOneWidget);
+    await tester.tap(finder);
+    await tester.pumpAndSettle();
   }
 
   Future<void> tapLogoutButton() async {
@@ -103,5 +117,12 @@ class AuthRobot {
     final emailWidget = find.byKey(EmailPasswordSignInScreen.passwordKey);
     expect(emailWidget, findsOneWidget);
     await tester.enterText(emailWidget, password);
+  }
+
+  Future<void> signInWithEmailAndPassword() async {
+    await enterEmail(email: 'test@test.com');
+    await enterPassword(password: '12345');
+    await tapEmailAndPasswordSubmitButton();
+    await tester.pumpAndSettle();
   }
 }
