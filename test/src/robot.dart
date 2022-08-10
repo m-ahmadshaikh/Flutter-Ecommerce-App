@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'features/authentication/auth_robot.dart';
+import 'mocks.dart';
 
 class Robot {
   final WidgetTester tester;
@@ -34,8 +35,8 @@ class Robot {
     // expect(popUpMenu, findsOneWidget);
     final ev = popUpMenu.evaluate();
     if (ev.isNotEmpty) {
-      tester.tap(popUpMenu);
-      tester.pumpAndSettle();
+    await  tester.tap(popUpMenu);
+     await  tester.pumpAndSettle();
     }
   }
 }

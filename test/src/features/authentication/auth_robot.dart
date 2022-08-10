@@ -30,6 +30,7 @@ class AuthRobot {
     await tester.tap(finder);
     await tester.pumpAndSettle();
   }
+
   Future<void> openAccountScreen() async {
     final finder = find.byKey(MoreMenuButton.accountKey);
     expect(finder, findsOneWidget);
@@ -89,7 +90,7 @@ class AuthRobot {
     final primaryButton = find.byType(PrimaryButton);
     expect(primaryButton, findsOneWidget);
     await tester.tap(primaryButton);
-    await tester.pump();
+    await tester.pumpAndSettle();
   }
 
   Future<void> pumpEmailAndPasswordSignInContents(
@@ -114,9 +115,9 @@ class AuthRobot {
   }
 
   Future<void> enterPassword({required String password}) async {
-    final emailWidget = find.byKey(EmailPasswordSignInScreen.passwordKey);
-    expect(emailWidget, findsOneWidget);
-    await tester.enterText(emailWidget, password);
+    final passwordWidget = find.byKey(EmailPasswordSignInScreen.passwordKey);
+    expect(passwordWidget, findsOneWidget);
+    await tester.enterText(passwordWidget, password);
   }
 
   Future<void> signInWithEmailAndPassword() async {
