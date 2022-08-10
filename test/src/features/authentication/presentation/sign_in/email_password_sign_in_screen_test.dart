@@ -7,57 +7,55 @@ import '../../auth_robot.dart';
 
 void main() {
   const testEmail = 'test@test.com';
-  const testPassword = '12345';
-  MockAuthRepository authRepository = MockAuthRepository();
+  const testPassword = '1234';
+  late MockAuthRepository authRepository;
   setUp(() {
     authRepository = MockAuthRepository();
   });
-
-  group('signin', () {
+  group('sign in', () {
     testWidgets('''
-    GIVEN FORMTYPE IS SIGNIN
-    WHEN TAP ON SIGNIN BUTTON
-    THEN SIGINWITHEMAILANDPASSWORD IS NOT CALLED
-''', (tester) async {
+        Given formType is signIn
+        When tap on the sign-in button
+        Then signInWithEmailAndPassword is not called
+        ''', (tester) async {
       final r = AuthRobot(tester);
-      await r.pumpEmailAndPasswordSignInContents(
+      await r.pumpEmailPasswordSignInContents(
         authRepository: authRepository,
         formType: EmailPasswordSignInFormType.signIn,
       );
       await r.tapEmailAndPasswordSubmitButton();
+      verifyNever(() => authRepository.signInWithEmailAndPassword(
+            any(),
+            any(),
+          ));
     });
-    verifyNever(
-      () => authRepository.signInWithEmailAndPassword(any(), any()),
-    );
     testWidgets('''
-    GIVEN FORMTYPE IS SIGNIN
-    WHEN ENTER EMAIL AND PASSWORD 
-    AND TAP ON SIGNIN BUTTON
-    THEN SIGINWITHEMAILANDPASSWORD IS CALLED
-    AND NO ERROR IS SHOWN
-''', (tester) async {
-      final r = AuthRobot(tester);
+        Given formType is signIn
+        When enter valid email and password
+        And tap on the sign-in button
+        Then signInWithEmailAndPassword is called
+        And onSignedIn callback is called
+        And error alert is not shown
+        ''', (tester) async {
       var didSignIn = false;
-      when(
-        () =>
-            authRepository.signInWithEmailAndPassword(testEmail, testPassword),
-      ).thenAnswer((invocation) => Future.value());
-      await r.pumpEmailAndPasswordSignInContents(
+      final r = AuthRobot(tester);
+      when(() => authRepository.signInWithEmailAndPassword(
+            testEmail,
+            testPassword,
+          )).thenAnswer((_) => Future.value());
+      await r.pumpEmailPasswordSignInContents(
         authRepository: authRepository,
         formType: EmailPasswordSignInFormType.signIn,
         onSignedIn: () => didSignIn = true,
       );
-      await r.enterEmail(email: testEmail);
-      await r.enterPassword(password: testPassword);
-
+      await r.enterEmail(testEmail);
+      await r.enterPassword(testPassword);
       await r.tapEmailAndPasswordSubmitButton();
-
-      verify(
-        () =>
-            authRepository.signInWithEmailAndPassword(testEmail, testPassword),
-      ).called(1);
-
-      r.expectNoError();
+      verify(() => authRepository.signInWithEmailAndPassword(
+            testEmail,
+            testPassword,
+          )).called(1);
+      r.expectErrorAlertNotFound();
       expect(didSignIn, true);
     });
   });

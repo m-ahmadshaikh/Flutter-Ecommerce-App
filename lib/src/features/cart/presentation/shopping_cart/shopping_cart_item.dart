@@ -1,7 +1,7 @@
 import 'dart:math';
 
 import 'package:ecommerce_app/src/common_widgets/alert_dialogs.dart';
-import 'package:ecommerce_app/src/common_widgets/custom_shimmer_widget.dart';
+import 'package:ecommerce_app/src/common_widgets/async_value_widget.dart';
 import 'package:ecommerce_app/src/features/products/data/fake_products_repository.dart';
 import 'package:ecommerce_app/src/localization/string_hardcoded.dart';
 import 'package:flutter/material.dart';
@@ -13,9 +13,6 @@ import 'package:ecommerce_app/src/features/cart/domain/item.dart';
 import 'package:ecommerce_app/src/features/products/domain/product.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:shimmer/shimmer.dart';
-
-import '../../../../common_widgets/async_value_widget.dart';
 
 /// Shows a shopping cart item (or loading/error UI if needed)
 class ShoppingCartItem extends ConsumerWidget {
@@ -35,25 +32,23 @@ class ShoppingCartItem extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final productValue = ref.watch(productsStreamProvider(item.productId));
-
-    return AsyncValueWidget(
-      loading: () => const CustomShimmerWidget(),
+    final productValue = ref.watch(productProvider(item.productId));
+    return AsyncValueWidget<Product?>(
       value: productValue,
-      data: ((product) => Padding(
-            padding: const EdgeInsets.symmetric(vertical: Sizes.p8),
-            child: Card(
-              child: Padding(
-                padding: const EdgeInsets.all(Sizes.p16),
-                child: ShoppingCartItemContents(
-                  product: product,
-                  item: item,
-                  itemIndex: itemIndex,
-                  isEditable: isEditable,
-                ),
-              ),
+      data: (product) => Padding(
+        padding: const EdgeInsets.symmetric(vertical: Sizes.p8),
+        child: Card(
+          child: Padding(
+            padding: const EdgeInsets.all(Sizes.p16),
+            child: ShoppingCartItemContents(
+              product: product!,
+              item: item,
+              itemIndex: itemIndex,
+              isEditable: isEditable,
             ),
-          )),
+          ),
+        ),
+      ),
     );
   }
 }

@@ -25,6 +25,11 @@ class Product {
   final int numRatings;
 
   @override
+  String toString() {
+    return 'Product(id: $id, imageUrl: $imageUrl, title: $title, description: $description, price: $price, availableQuantity: $availableQuantity, avgRating: $avgRating, numRatings: $numRatings)';
+  }
+
+  @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
 
@@ -49,10 +54,5 @@ class Product {
         availableQuantity.hashCode ^
         avgRating.hashCode ^
         numRatings.hashCode;
-  }
-
-  @override
-  String toString() {
-    return 'Product(id: $id, imageUrl: $imageUrl, title: $title, description: $description, price: $price, availableQuantity: $availableQuantity, avgRating: $avgRating, numRatings: $numRatings)';
   }
 }

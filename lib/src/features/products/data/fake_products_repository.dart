@@ -3,18 +3,22 @@ import 'package:ecommerce_app/src/features/products/domain/product.dart';
 import 'package:ecommerce_app/src/utils/delay.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class FakeProductRepository {
+class FakeProductsRepository {
+  FakeProductsRepository({this.addDelay = true});
   final bool addDelay;
   final List<Product> _products = kTestProducts;
 
-  FakeProductRepository({this.addDelay = true});
+  List<Product> getProductsList() {
+    return _products;
+  }
 
-  Product? getProduct({required String id}) {
+  Product? getProduct(String id) {
     return _getProduct(_products, id);
   }
 
-  List<Product> getProductsList() {
-    return _products;
+  Future<List<Product>> fetchProductsList() async {
+    await delay(addDelay);
+    return Future.value(_products);
   }
 
   Stream<List<Product>> watchProductsList() async* {
@@ -22,13 +26,8 @@ class FakeProductRepository {
     yield _products;
   }
 
-  Stream<Product?> watchProduct({required String id}) {
+  Stream<Product?> watchProduct(String id) {
     return watchProductsList().map((products) => _getProduct(products, id));
-  }
-
-  Future<List<Product>> fetchProductList() async {
-    await delay(addDelay);
-    return Future.value(_products);
   }
 
   static Product? _getProduct(List<Product> products, String id) {
@@ -40,25 +39,24 @@ class FakeProductRepository {
   }
 }
 
-final productsRepositoryProvider =
-    Provider.autoDispose<FakeProductRepository>((ref) {
-  return FakeProductRepository();
+final productsRepositoryProvider = Provider<FakeProductsRepository>((ref) {
+  return FakeProductsRepository();
 });
 
 final productsListStreamProvider =
     StreamProvider.autoDispose<List<Product>>((ref) {
-  final fakeRepositoryProvider = ref.watch(productsRepositoryProvider);
-  return fakeRepositoryProvider.watchProductsList();
+  final productsRepository = ref.watch(productsRepositoryProvider);
+  return productsRepository.watchProductsList();
 });
 
 final productsListFutureProvider =
     FutureProvider.autoDispose<List<Product>>((ref) {
-  final fakeRepositoryProvider = ref.watch(productsRepositoryProvider);
-  return fakeRepositoryProvider.fetchProductList();
+  final productsRepository = ref.watch(productsRepositoryProvider);
+  return productsRepository.fetchProductsList();
 });
 
-final productsStreamProvider =
-    StreamProvider.family.autoDispose<Product?, String>((ref, id) {
-  final fakeRepositoryProvider = ref.watch(productsRepositoryProvider);
-  return fakeRepositoryProvider.watchProduct(id: id);
+final productProvider =
+    StreamProvider.autoDispose.family<Product?, String>((ref, id) {
+  final productsRepository = ref.watch(productsRepositoryProvider);
+  return productsRepository.watchProduct(id);
 });

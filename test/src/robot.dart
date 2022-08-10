@@ -8,35 +8,41 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'features/authentication/auth_robot.dart';
-import 'mocks.dart';
 
 class Robot {
+  Robot(this.tester) : auth = AuthRobot(tester);
   final WidgetTester tester;
   final AuthRobot auth;
-  Robot(this.tester) : auth = AuthRobot(tester);
 
   Future<void> pumpMyApp() async {
+    final productsRepository = FakeProductsRepository(addDelay: false);
     final authRepository = FakeAuthRepository(addDelay: false);
-    final productReposiotry = FakeProductRepository(addDelay: false);
-    await tester.pumpWidget(ProviderScope(overrides: [
-      authRepositoryProvider.overrideWithValue(authRepository),
-      productsRepositoryProvider.overrideWithValue(productReposiotry)
-    ], child: const MyApp()));
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          productsRepositoryProvider.overrideWithValue(productsRepository),
+          authRepositoryProvider.overrideWithValue(authRepository),
+        ],
+        child: const MyApp(),
+      ),
+    );
     await tester.pumpAndSettle();
   }
 
-  void expectNProducts() {
+  void expectFindAllProductCards() {
     final finder = find.byType(ProductCard);
     expect(finder, findsNWidgets(kTestProducts.length));
   }
 
-  Future<void> openPopUpMenu() async {
-    final popUpMenu = find.byType(MoreMenuButton);
-    // expect(popUpMenu, findsOneWidget);
-    final ev = popUpMenu.evaluate();
-    if (ev.isNotEmpty) {
-    await  tester.tap(popUpMenu);
-     await  tester.pumpAndSettle();
+  Future<void> openPopupMenu() async {
+    final finder = find.byType(MoreMenuButton);
+    final matches = finder.evaluate();
+    // if an item is found, it means that we're running
+    // on a small window and can tap to reveal the menu
+    if (matches.isNotEmpty) {
+      await tester.tap(finder);
+      await tester.pumpAndSettle();
     }
+    // else no-op, as the items are already visible
   }
 }

@@ -30,8 +30,8 @@ final goRouterProvider = Provider<GoRouter>((ref) {
     initialLocation: '/',
     debugLogDiagnostics: false,
     redirect: (state) {
-      final isLoggedin = authRepository.currentUser != null;
-      if (isLoggedin) {
+      final isLoggedIn = authRepository.currentUser != null;
+      if (isLoggedIn) {
         if (state.location == '/signIn') {
           return '/';
         }
@@ -42,7 +42,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       }
       return null;
     },
-    refreshListenable: GoRouterRefreshStream( authRepository.authStateChanges()),
+    refreshListenable: GoRouterRefreshStream(authRepository.authStateChanges()),
     routes: [
       GoRoute(
         path: '/',

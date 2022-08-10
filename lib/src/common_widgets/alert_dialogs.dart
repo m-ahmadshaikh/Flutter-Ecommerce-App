@@ -1,10 +1,11 @@
 import 'dart:io';
 
-import 'package:ecommerce_app/src/features/authentication/presentation/account/account_screen.dart';
 import 'package:ecommerce_app/src/localization/string_hardcoded.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+
+const kDialogDefaultKey = Key('dialog-default-key');
 
 /// Generic function to show a platform-aware Material or Cupertino dialog
 Future<bool?> showAlertDialog({
@@ -49,8 +50,7 @@ Future<bool?> showAlertDialog({
             onPressed: () => Navigator.of(context).pop(false),
           ),
         CupertinoDialogAction(
-
-            key: kDialogDefaultKey,
+          key: kDialogDefaultKey,
           child: Text(defaultActionText),
           onPressed: () => Navigator.of(context).pop(true),
         ),

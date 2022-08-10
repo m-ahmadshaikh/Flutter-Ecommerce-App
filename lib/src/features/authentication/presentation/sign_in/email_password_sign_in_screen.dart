@@ -1,5 +1,5 @@
+import 'package:ecommerce_app/src/features/authentication/presentation/sign_in/email_password_sign_in_controller.dart';
 import 'package:ecommerce_app/src/features/authentication/presentation/sign_in/email_password_sign_in_state.dart';
-import 'package:ecommerce_app/src/features/authentication/presentation/sign_in/email_password_signin_controller.dart';
 import 'package:ecommerce_app/src/features/authentication/presentation/sign_in/string_validators.dart';
 import 'package:ecommerce_app/src/localization/string_hardcoded.dart';
 import 'package:ecommerce_app/src/utils/async_value_ui.dart';
@@ -28,7 +28,6 @@ class EmailPasswordSignInScreen extends StatelessWidget {
       appBar: AppBar(title: Text('Sign In'.hardcoded)),
       body: EmailPasswordSignInContents(
         formType: formType,
-        onSignedIn: () => Navigator.of(context).pop(),
       ),
     );
   }
@@ -67,7 +66,6 @@ class _EmailPasswordSignInContentsState
   // For more details on how this is implemented, see:
   // https://codewithandrea.com/articles/flutter-text-field-form-validation/
   var _submitted = false;
-  // local variable representing the form type and loading state
 
   @override
   void dispose() {
@@ -84,7 +82,6 @@ class _EmailPasswordSignInContentsState
     if (_formKey.currentState!.validate()) {
       final controller = ref.read(
           emailPasswordSignInControllerProvider(widget.formType).notifier);
-
       final success = await controller.submit(email, password);
       if (success) {
         widget.onSignedIn?.call();
@@ -108,12 +105,9 @@ class _EmailPasswordSignInContentsState
 
   void _updateFormType(EmailPasswordSignInFormType formType) {
     // * Toggle between register and sign in form
-
-    final controller = ref.read(emailPasswordSignInControllerProvider(
-      widget.formType,
-    ).notifier);
-    controller.updateFormType(formType);
-
+    ref
+        .read(emailPasswordSignInControllerProvider(widget.formType).notifier)
+        .updateFormType(formType);
     // * Clear the password field when doing so
     _passwordController.clear();
   }
@@ -121,12 +115,12 @@ class _EmailPasswordSignInContentsState
   @override
   Widget build(BuildContext context) {
     ref.listen<AsyncValue>(
-        emailPasswordSignInControllerProvider(widget.formType)
-            .select((value) => value.value),
-        (previous, state) => state.showAlertErrorDialogBox(context));
+      emailPasswordSignInControllerProvider(widget.formType)
+          .select((state) => state.value),
+      (_, state) => state.showAlertDialogOnError(context),
+    );
     final state =
         ref.watch(emailPasswordSignInControllerProvider(widget.formType));
-
     return ResponsiveScrollableCard(
       child: FocusScope(
         node: _node,

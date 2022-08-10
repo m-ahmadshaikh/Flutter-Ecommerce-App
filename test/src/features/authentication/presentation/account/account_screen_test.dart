@@ -6,7 +6,7 @@ import '../../../../mocks.dart';
 import '../../auth_robot.dart';
 
 void main() {
-  testWidgets('Cancel Logout', (tester) async {
+  testWidgets('Cancel logout', (tester) async {
     final r = AuthRobot(tester);
     await r.pumpAccountScreen();
     await r.tapLogoutButton();
@@ -14,53 +14,47 @@ void main() {
     await r.tapCancelButton();
     r.expectLogoutDialogNotFound();
   });
-  testWidgets('Confirm Logout, Success', (tester) async {
+  testWidgets('Confirm logout, success', (tester) async {
     final r = AuthRobot(tester);
     await r.pumpAccountScreen();
     await r.tapLogoutButton();
     r.expectLogoutDialogFound();
     await r.tapDialogLogoutButton();
     r.expectLogoutDialogNotFound();
-    r.expectNoError();
+    r.expectErrorAlertNotFound();
   });
-
-  testWidgets('Confirm Logout, Failure', (tester) async {
+  testWidgets('Confirm logout, failure', (tester) async {
     final r = AuthRobot(tester);
     final authRepository = MockAuthRepository();
-    when(
-      () => authRepository.authStateChanges(),
-    ).thenAnswer((invocation) =>
-        Stream.value(const AppUser(uid: '123', email: 'test@test.com')));
     final exception = Exception('Connection Failed');
-    when(
-      () => authRepository.signOut(),
-    ).thenThrow(exception);
-
+    when(authRepository.signOut).thenThrow(exception);
+    when(authRepository.authStateChanges).thenAnswer(
+      (_) => Stream.value(
+        const AppUser(uid: '123', email: 'test@test.com'),
+      ),
+    );
     await r.pumpAccountScreen(authRepository: authRepository);
     await r.tapLogoutButton();
     r.expectLogoutDialogFound();
     await r.tapDialogLogoutButton();
-    r.expectError();
+    r.expectErrorAlertFound();
   });
-  testWidgets('Confirm Logout, LoadingState', (tester) async {
+  testWidgets('Confirm logout, loading state', (tester) async {
     final r = AuthRobot(tester);
     final authRepository = MockAuthRepository();
-    when(
-      () => authRepository.signOut(),
-    ).thenAnswer((_) => Future.delayed(const Duration(seconds: 1)));
-
-    when(
-      () => authRepository.authStateChanges(),
-    ).thenAnswer((invocation) =>
-        Stream.value(const AppUser(uid: '123', email: 'test@test.com')));
-    
-    await tester.runAsync(() async{
-
-
+    when(authRepository.signOut).thenAnswer(
+      (_) => Future.delayed(const Duration(seconds: 1)),
+    );
+    when(authRepository.authStateChanges).thenAnswer(
+      (_) => Stream.value(
+        const AppUser(uid: '123', email: 'test@test.com'),
+      ),
+    );
     await r.pumpAccountScreen(authRepository: authRepository);
-    await r.tapLogoutButton();
-    r.expectLogoutDialogFound();
-    await r.tapDialogLogoutButton();
+    await tester.runAsync(() async {
+      await r.tapLogoutButton();
+      r.expectLogoutDialogFound();
+      await r.tapDialogLogoutButton();
     });
     r.expectCircularProgressIndicator();
   });

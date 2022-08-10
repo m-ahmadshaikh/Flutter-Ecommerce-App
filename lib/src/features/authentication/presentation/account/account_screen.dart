@@ -10,17 +10,16 @@ import 'package:ecommerce_app/src/constants/app_sizes.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Simple account screen showing some user info and a logout button.
-final kDialogDefaultKey = Key('Default-Alert-DialogBox-Key');
-
 class AccountScreen extends ConsumerWidget {
-  const AccountScreen({Key? key}) : super(key: key);
+  const AccountScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    ref.listen<AsyncValue>(
+      accountScreenControllerProvider,
+      (_, state) => state.showAlertDialogOnError(context),
+    );
     final state = ref.watch(accountScreenControllerProvider);
-    ref.listen<AsyncValue>(accountScreenControllerProvider,
-        (previousState, state) => state.showAlertErrorDialogBox(context));
-
     return Scaffold(
       appBar: AppBar(
         title: state.isLoading
@@ -41,7 +40,7 @@ class AccountScreen extends ConsumerWidget {
                     if (logout == true) {
                       ref
                           .read(accountScreenControllerProvider.notifier)
-                          .signout();
+                          .signOut();
                     }
                   },
           ),
@@ -57,13 +56,12 @@ class AccountScreen extends ConsumerWidget {
 
 /// Simple user data table showing the uid and email
 class UserDataTable extends ConsumerWidget {
-  const UserDataTable({Key? key}) : super(key: key);
+  const UserDataTable({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final user = ref.watch(authStateProvider).value;
     final style = Theme.of(context).textTheme.subtitle2!;
-
+    final user = ref.watch(authStateChangesProvider).value;
     return DataTable(
       columns: [
         DataColumn(
@@ -82,7 +80,7 @@ class UserDataTable extends ConsumerWidget {
       rows: [
         _makeDataRow(
           'uid'.hardcoded,
-          user?.uid ?? " ",
+          user?.uid ?? '',
           style,
         ),
         _makeDataRow(

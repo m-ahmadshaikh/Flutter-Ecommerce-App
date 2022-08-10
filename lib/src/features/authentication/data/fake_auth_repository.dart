@@ -4,28 +4,22 @@ import 'package:ecommerce_app/src/utils/in_memory_store.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class FakeAuthRepository {
-  final addDelay;
+  FakeAuthRepository({this.addDelay = true});
+  final bool addDelay;
   final _authState = InMemoryStore<AppUser?>(null);
 
-  FakeAuthRepository({this.addDelay = true});
-  Stream<AppUser?> authStateChanges() => _authState.stream();
+  Stream<AppUser?> authStateChanges() => _authState.stream;
   AppUser? get currentUser => _authState.value;
-
-  Future<void> createUserWithEmailAndPassword(
-      String email, String password) async {
-    if (currentUser == null) {
-      _authState.value = _createCurrentUser(email);
-    }
-  }
 
   Future<void> signInWithEmailAndPassword(String email, String password) async {
     await delay(addDelay);
-
-    _authState.value = _createCurrentUser(email);
+    _createNewUser(email);
   }
 
-  AppUser _createCurrentUser(String email) {
-    return AppUser(uid: email.split('').reversed.join(), email: email);
+  Future<void> createUserWithEmailAndPassword(
+      String email, String password) async {
+    await delay(addDelay);
+    _createNewUser(email);
   }
 
   Future<void> signOut() async {
@@ -33,16 +27,22 @@ class FakeAuthRepository {
   }
 
   void dispose() => _authState.close();
+
+  void _createNewUser(String email) {
+    _authState.value = AppUser(
+      uid: email.split('').reversed.join(),
+      email: email,
+    );
+  }
 }
 
 final authRepositoryProvider = Provider<FakeAuthRepository>((ref) {
-  final authRepository = FakeAuthRepository();
-  ref.onDispose(() => authRepository.dispose());
-  return authRepository;
+  final auth = FakeAuthRepository();
+  ref.onDispose(() => auth.dispose());
+  return auth;
 });
 
-final authStateProvider = StreamProvider.autoDispose<AppUser?>((ref) {
+final authStateChangesProvider = StreamProvider.autoDispose<AppUser?>((ref) {
   final authRepository = ref.watch(authRepositoryProvider);
-
   return authRepository.authStateChanges();
 });
