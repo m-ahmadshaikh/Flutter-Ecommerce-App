@@ -1,5 +1,8 @@
+import 'package:ecommerce_app/src/common_widgets/primary_button.dart';
 import 'package:ecommerce_app/src/features/authentication/data/fake_auth_repository.dart';
 import 'package:ecommerce_app/src/features/authentication/presentation/account/account_screen.dart';
+import 'package:ecommerce_app/src/features/authentication/presentation/sign_in/email_password_sign_in_screen.dart';
+import 'package:ecommerce_app/src/features/authentication/presentation/sign_in/email_password_sign_in_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -61,5 +64,44 @@ class AuthRobot {
     expect(logoutButton, findsOneWidget);
     await tester.tap(logoutButton);
     await tester.pump();
+  }
+
+  void expectCircularProgressIndicator() {
+    final circularIndicator = find.byType(CircularProgressIndicator);
+    expect(circularIndicator, findsOneWidget);
+  }
+
+  Future<void> tapEmailAndPasswordSubmitButton() async {
+    final primaryButton = find.byType(PrimaryButton);
+    expect(primaryButton, findsOneWidget);
+    await tester.tap(primaryButton);
+    await tester.pump();
+  }
+
+  Future<void> pumpEmailAndPasswordSignInContents(
+      {required EmailPasswordSignInFormType formType,
+      required FakeAuthRepository authRepository,
+      VoidCallback? onSignedIn}) async {
+    await tester.pumpWidget(ProviderScope(
+      overrides: [authRepositoryProvider.overrideWithValue(authRepository)],
+      child: MaterialApp(
+          home: Scaffold(
+              body: EmailPasswordSignInContents(
+        formType: formType,
+        onSignedIn: onSignedIn,
+      ))),
+    ));
+  }
+
+  Future<void> enterEmail({required String email}) async {
+    final emailWidget = find.byKey(EmailPasswordSignInScreen.emailKey);
+    expect(emailWidget, findsOneWidget);
+    await tester.enterText(emailWidget, email);
+  }
+
+  Future<void> enterPassword({required String password}) async {
+    final emailWidget = find.byKey(EmailPasswordSignInScreen.passwordKey);
+    expect(emailWidget, findsOneWidget);
+    await tester.enterText(emailWidget, password);
   }
 }

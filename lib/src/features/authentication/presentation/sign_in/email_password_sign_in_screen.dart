@@ -15,8 +15,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 /// Wraps the [EmailPasswordSignInContents] widget below with a [Scaffold] and
 /// [AppBar] with a title.
 class EmailPasswordSignInScreen extends StatelessWidget {
-  const EmailPasswordSignInScreen({Key? key, required this.formType})
-      : super(key: key);
+  const EmailPasswordSignInScreen({super.key, required this.formType});
   final EmailPasswordSignInFormType formType;
 
   // * Keys for testing using find.byKey()
@@ -40,10 +39,10 @@ class EmailPasswordSignInScreen extends StatelessWidget {
 /// - register (create an account)
 class EmailPasswordSignInContents extends ConsumerStatefulWidget {
   const EmailPasswordSignInContents({
-    Key? key,
+    super.key,
     this.onSignedIn,
     required this.formType,
-  }) : super(key: key);
+  });
   final VoidCallback? onSignedIn;
 
   /// The default form type to use.
@@ -85,8 +84,11 @@ class _EmailPasswordSignInContentsState
     if (_formKey.currentState!.validate()) {
       final controller = ref.read(
           emailPasswordSignInControllerProvider(widget.formType).notifier);
-      controller.submit(email, password);
-     
+
+      final success = await controller.submit(email, password);
+      if (success) {
+        widget.onSignedIn?.call();
+      }
     }
   }
 
